@@ -3,30 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gamblers Table - Fullscreen</title>
+  <title>Gamblers Table - Cropped Fullscreen</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: #000;
       overflow: hidden;
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: black;
     }
-    #block-msg {
-      display: none;
-      text-align: center;
-      padding: 2rem;
+    #container {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
     }
     iframe {
       border: none;
-      width: 100vw;
-      height: 100vh;
-      display: block;
+      width: 120vw;
+      height: 120vh;
+      transform: scale(1.3) translate(-15%, -10%);
+      transform-origin: top left;
+      pointer-events: auto;
+    }
+    #block-msg {
+      display: none;
+      position: absolute;
+      inset: 0;
+      color: white;
+      background: black;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: sans-serif;
     }
   </style>
 </head>
@@ -36,34 +47,32 @@
     <p>This content is only available on desktop devices.</p>
   </div>
 
-  <iframe
-    id="game-frame"
-    src="https://www.miniplay.com/embed/gamblers-table"
-    allowfullscreen
-    frameborder="0"
-  ></iframe>
+  <div id="container">
+    <iframe
+      id="game-frame"
+      src="https://www.miniplay.com/embed/gamblers-table"
+      allowfullscreen
+    ></iframe>
+  </div>
 
   <script>
     // BLOCK MOBILE DEVICES
     if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       document.getElementById("game-frame").style.display = "none";
-      document.getElementById("block-msg").style.display = "block";
+      document.getElementById("block-msg").style.display = "flex";
     } else {
-      // REQUEST FULLSCREEN ON DESKTOP
-      const iframe = document.getElementById("game-frame");
-
-      function requestFullScreen(element) {
-        if (element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if (element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen();
-        } else if (element.msRequestFullscreen) {
-          element.msRequestFullscreen();
-        }
-      }
-
+      // Try to request fullscreen
       window.onload = () => {
-        requestFullScreen(document.documentElement); // fullscreen the whole page
+        const docElm = document.documentElement;
+        if (docElm.requestFullscreen) {
+          docElm.requestFullscreen();
+        } else if (docElm.mozRequestFullScreen) {
+          docElm.mozRequestFullScreen();
+        } else if (docElm.webkitRequestFullscreen) {
+          docElm.webkitRequestFullscreen();
+        } else if (docElm.msRequestFullscreen) {
+          docElm.msRequestFullscreen();
+        }
       };
     }
   </script>
