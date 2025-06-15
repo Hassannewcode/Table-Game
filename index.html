@@ -25,7 +25,7 @@
       transform: scale(1.3) translate(-15%, -10%);
       transform-origin: top left;
       pointer-events: auto;
-      display: block;
+      display: none; /* start hidden, show after verification */
     }
     #block-msg {
       display: none;
@@ -42,9 +42,43 @@
       text-align: center;
       padding: 2rem;
     }
+    #verify-msg {
+      position: absolute;
+      inset: 0;
+      background: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+    #verify-msg button {
+      margin: 1rem;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      background: #222;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 4px;
+      transition: background 0.3s ease;
+    }
+    #verify-msg button:hover {
+      background: #555;
+    }
   </style>
 </head>
 <body>
+  <div id="verify-msg">
+    <h2>Please confirm your device</h2>
+    <p>Are you using a desktop device to play this game?</p>
+    <button id="btn-yes">Yes, I'm on desktop</button>
+    <button id="btn-no">No, I'm on mobile</button>
+  </div>
+
   <div id="block-msg">
     <h2>Access Denied</h2>
     <p>This content is only available on desktop devices.</p>
@@ -59,24 +93,31 @@
   </div>
 
   <script>
-    // Improved detection to reduce false positives on desktop
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1;
+    const verifyMsg = document.getElementById('verify-msg');
+    const gameFrame = document.getElementById('game-frame');
+    const blockMsg = document.getElementById('block-msg');
 
-    if (isMobile) {
-      document.getElementById("game-frame").style.display = "none";
-      document.getElementById("block-msg").style.display = "flex";
-    } else {
-      window.onload = () => {
-        const docElm = document.documentElement;
-        if (docElm.requestFullscreen) {
-          docElm.requestFullscreen();
-        } else if (docElm.webkitRequestFullscreen) {
-          docElm.webkitRequestFullscreen();
-        } else if (docElm.msRequestFullscreen) {
-          docElm.msRequestFullscreen();
-        }
-      };
-    }
+    document.getElementById('btn-yes').onclick = () => {
+      verifyMsg.style.display = 'none';
+      gameFrame.style.display = 'block';
+      blockMsg.style.display = 'none';
+
+      // Request fullscreen after user confirms desktop
+      const docElm = document.documentElement;
+      if (docElm.requestFullscreen) {
+        docElm.requestFullscreen();
+      } else if (docElm.webkitRequestFullscreen) {
+        docElm.webkitRequestFullscreen();
+      } else if (docElm.msRequestFullscreen) {
+        docElm.msRequestFullscreen();
+      }
+    };
+
+    document.getElementById('btn-no').onclick = () => {
+      verifyMsg.style.display = 'none';
+      gameFrame.style.display = 'none';
+      blockMsg.style.display = 'flex';
+    };
   </script>
 </body>
 </html>
