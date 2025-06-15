@@ -59,14 +59,13 @@
   </div>
 
   <script>
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
+    // Improved detection to reduce false positives on desktop
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1;
+
     if (isMobile) {
-      // Block mobile users
       document.getElementById("game-frame").style.display = "none";
       document.getElementById("block-msg").style.display = "flex";
     } else {
-      // Request fullscreen on desktop after page loads
       window.onload = () => {
         const docElm = document.documentElement;
         if (docElm.requestFullscreen) {
