@@ -3,14 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Table Game - Cropped Fullscreen</title>
+  <title>Table Game - Fullscreen Verification</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: black;
+      margin: 0; padding: 0; height: 100%; overflow: hidden; background: black;
+      font-family: sans-serif;
     }
     #container {
       width: 100vw;
@@ -25,7 +22,7 @@
       transform: scale(1.3) translate(-15%, -10%);
       transform-origin: top left;
       pointer-events: auto;
-      display: none; /* start hidden, show after verification */
+      display: none; /* Hidden initially */
     }
     #block-msg {
       display: none;
@@ -38,50 +35,29 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      font-family: sans-serif;
       text-align: center;
       padding: 2rem;
     }
-    #verify-msg {
-      position: absolute;
-      inset: 0;
-      background: black;
+    #fullscreen-btn {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 1.5rem 3rem;
+      font-size: 1.5rem;
+      background: #1e90ff;
       color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      font-family: sans-serif;
-      padding: 2rem;
-    }
-    #verify-msg button {
-      margin: 1rem;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      background: #222;
-      border: 1px solid #555;
-      color: white;
-      border-radius: 4px;
-      transition: background 0.3s ease;
-    }
-    #verify-msg button:hover {
-      background: #555;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
-  <div id="verify-msg">
-    <h2>Please confirm your device</h2>
-    <p>Are you using a desktop device to play this game?</p>
-    <button id="btn-yes">Yes, I'm on desktop</button>
-    <button id="btn-no">No, I'm on mobile</button>
-  </div>
-
   <div id="block-msg">
     <h2>Access Denied</h2>
-    <p>This content is only available on desktop devices.</p>
+    <p>Tap detected without mouse movement.<br>This content is only available with real mouse interaction on desktop devices.</p>
   </div>
 
   <div id="container">
@@ -89,20 +65,55 @@
       id="game-frame"
       src="https://www.miniplay.com/embed/gamblers-table"
       allowfullscreen
+      title="Table Game"
     ></iframe>
   </div>
 
+  <button id="fullscreen-btn">Click to Verify and Enter Fullscreen</button>
+
   <script>
-    const verifyMsg = document.getElementById('verify-msg');
-    const gameFrame = document.getElementById('game-frame');
-    const blockMsg = document.getElementById('block-msg');
+    const btn = document.getElementById("fullscreen-btn");
+    const iframe = document.getElementById("game-frame");
+    const blockMsg = document.getElementById("block-msg");
 
-    document.getElementById('btn-yes').onclick = () => {
-      verifyMsg.style.display = 'none';
-      gameFrame.style.display = 'block';
-      blockMsg.style.display = 'none';
+    let startX = null;
+    let startY = null;
+    let moved = false;
+    const moveThreshold = 10; // pixels needed to consider movement
 
-      // Request fullscreen after user confirms desktop
+    btn.addEventListener("mousedown", (e) => {
+      startX = e.clientX;
+      startY = e.clientY;
+      moved = false;
+    });
+
+    btn.addEventListener("mousemove", (e) => {
+      if (startX === null || startY === null) return;
+      const dx = Math.abs(e.clientX - startX);
+      const dy = Math.abs(e.clientY - startY);
+      if (dx > moveThreshold || dy > moveThreshold) {
+        moved = true;
+      }
+    });
+
+    btn.addEventListener("mouseup", (e) => {
+      if (moved) {
+        // Valid mouse interaction: show iframe, hide messages & button, enter fullscreen
+        blockMsg.style.display = "none";
+        btn.style.display = "none";
+        iframe.style.display = "block";
+        enterFullscreen();
+      } else {
+        // Tap or click without movement - show block message
+        blockMsg.style.display = "flex";
+        iframe.style.display = "none";
+      }
+      startX = null;
+      startY = null;
+      moved = false;
+    });
+
+    function enterFullscreen() {
       const docElm = document.documentElement;
       if (docElm.requestFullscreen) {
         docElm.requestFullscreen();
@@ -111,13 +122,7 @@
       } else if (docElm.msRequestFullscreen) {
         docElm.msRequestFullscreen();
       }
-    };
-
-    document.getElementById('btn-no').onclick = () => {
-      verifyMsg.style.display = 'none';
-      gameFrame.style.display = 'none';
-      blockMsg.style.display = 'flex';
-    };
+    }
   </script>
 </body>
 </html>
