@@ -1,64 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Crossy Road Embed with Built-in Adblocker</title>
-<style>
-  html, body {
-    margin: 0; padding: 0; height: 100vh; overflow: hidden;
-    background: #121212;
-    display: flex;
-    flex-direction: column;
-  }
-  iframe {
-    border: none;
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-  }
-</style>
-</head>
-<body>
-
-<!-- Embedded game iframe from Pastebin -->
-<iframe 
-  src="https://pastebin.com/embed_iframe/tssvCq5B?theme=dark"
-  allowfullscreen
-  sandbox="allow-scripts allow-same-origin allow-pointer-lock"
+<iframe
+  style="width:100%; height:600px; border:none;"
+  sandbox="allow-scripts"
+  srcdoc='
+    <!DOCTYPE html>
+    <html lang="en">
+    <head><meta charset="UTF-8"></head>
+    <body>
+      <script src="https://pastebin.com/raw/tssvCq5B"></script>
+    </body>
+    </html>
+  '
 ></iframe>
-
-<script>
-// Simple adblocker: removes common ad elements in this page only
-function removeAds() {
-  // Remove iframes that look like ads, except our Pastebin iframe
-  document.querySelectorAll('iframe').forEach(el => {
-    if(el === document.querySelector('iframe[src*="pastebin.com"]')) return;
-    const src = el.src || '';
-    if(src.match(/ads?|doubleclick|googlesyndication|advertisement/i)) {
-      el.remove();
-    }
-  });
-
-  // Remove elements with common ad-related classes or IDs
-  const adSelectors = [
-    '[id*="ad"]',
-    '[class*="ad"]',
-    '.ads',
-    '.adsbox',
-    '.advertisement',
-    '.popup',
-    '.modal',
-    '.overlay'
-  ];
-  adSelectors.forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => el.remove());
-  });
-}
-
-// Run every 2 seconds
-setInterval(removeAds, 2000);
-</script>
-
-</body>
-</html>
